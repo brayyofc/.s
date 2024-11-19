@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        h1, h2 {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #007bff;
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            left: -250px;
+            transition: left 0.3s ease-in-out;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.visible {
+            left: 0;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            font-size: 1.5em;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: #0056b3;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .menu-item:hover {
+            background: #0069d9;
+            color: #fff;
+        }
+
+        /* Sidebar toggle button */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: #0056b3;
+        }
+
+        /* Main content styles */
+        .main {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main.full-width {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .content-section {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Chat GPT Styles */
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h2>Menu Navigasi</h2>
+        <div class="menu-item" onclick="showContent('dashboard')">Dashboard</div>
+        <div class="menu-item" onclick="showContent('api-management')">API Management</div>
+        <div class="menu-item" onclick="showContent('chat-gpt')">Chat GPT</div>
+        <div class="menu-item" onclick="showContent('settings')">Pengaturan</div>
+        <div class="menu-item" onclick="toggleTheme()">Ganti Tema</div>
+    </div>
+
+    <!-- Sidebar toggle button -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- Main Content -->
+    <div class="main" id="mainContent">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section">
+            <h1>Dashboard Utama</h1>
+            <div class="cards">
+                <div class="card">
+                    <p>Jumlah apikey</p>
+                    <h2>1200</h2>
+                </div>
+                <div class="card">
+                    <p>Jumlah online</p>
+                    <h2>50</h2>
+                </div>
+                <div class="card">
+                    <p>Total premium</p>
+                    <h2>30</h2>
+                </div>
+                <div class="card">
+                    <p>Waktu</p>
+                    <h2 id="current-time">Loading...</h2>
+                </div>
+                <div class="card">
+                    <p>Tanggal</p>
+                    <h2 id="current-date">Loading...</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Management Section -->
+        <div id="api-management" class="content-section hidden">
+            <h1>API Management</h1>
+            <p>Kelola dan buat API Key Anda untuk digunakan dengan layanan kami.</p>
+            <div class="apikey-container">
+                <h3>Default API Key:</h3>
+                <div class="apikey" id="default-apikey">AwanBrayy010308</div>
+            </div>
+            <div class="apikey-container">
+                <h3>Generate New API Key:</h3>
+                <button onclick="generateApiKey()">Generate API Key</button>
+                <div class="apikey" id="new-apikey"></div>
+            </div>
+            <div class="note">
+                <p>API Key akan digunakan untuk mengakses endpoint di <b>https://api.betabotz.eu.org</b>.</p>
+                <p>Pastikan API Key Anda dirahasiakan!</p>
+            </div>
+        </div>
+
+        <div id="chat-gpt" class="content-section hidden">
+            <h1>bot wanz</h1>
+            <p>Berinteraksi dengan pelanggan dan menawarkan produk langsung melalui bot.</p>
+            <iframe 
+                src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2024/11/18/21/20241118215809-PFIMU99F.json&botId=d84facd6-268f-4825-bd87-8ecc6dd07014">
+            </iframe>
+        </div>
+
+        <!-- Pengaturan Section -->
+        <div id="settings" class="content-section hidden">
+            <h1>Pengaturan</h1>
+            <p>Atur preferensi Anda di sini.</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const isSidebarVisible = sidebar.classList.toggle('visible');
+            mainContent.classList.toggle('full-width', !isSidebarVisible);
+        }
+
+        function showContent(sectionId) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('current-time');
+            const dateElement = document.getElementById('current-date');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            timeElement.textContent = `${hours}:${minutes}:${seconds} WIB`;
+
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const dayName = days[now.getDay()];
+            const date = String(now.getDate()).padStart(2, '0');
+            const monthName = months[now.getMonth()];
+            const year = now.getFullYear();
+            dateElement.textContent = `${dayName}, ${date} ${monthName} ${year}`;
+        }
+
+        function generateApiKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let apiKey = '';
+            for (let i = 0; i < 16; i++) {
+                apiKey += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById("new-apikey").textContent = apiKey;
+        }
+
+        function toggleTheme() {
+            alert("Fitur ganti tema dalam pengembangan.");
+        }
+
+        setInterval(updateTime, 1000);
+        window.onload = () => {
+            document.getElementById("default-apikey").textContent = "AwanBrayy010308";
+        };
+    </script>
+</body>
+</html>
